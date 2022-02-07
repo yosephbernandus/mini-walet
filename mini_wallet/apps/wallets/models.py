@@ -1,3 +1,4 @@
+from faulthandler import disable
 import uuid
 from django.db import models
 from django.utils import timezone
@@ -22,8 +23,9 @@ class Wallet(models.Model):
     owned_by = models.OneToOneField(WalletID, related_name="wallet", on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
     enabled_at = models.DateTimeField(blank=True, null=True)
+    disabled_at = models.DateTimeField(blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
+
     def __str__(self):
         return f"{self.owned_by.id}"
 

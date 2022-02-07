@@ -68,6 +68,51 @@ class Wallet(WalletAuthenticationView):
         }
         return Response(response)
 
+    def put(self, request: Request) -> Response:
+        token = request.headers.get('Authorization')
+
+        wallet_id = get_object_or_404(WalletID, token=token)
+        if not hasattr(wallet_id, 'wallet'):
+            data = {
+                "data": "wallet not found",
+                "status": "failed"
+            }
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+        wallet = wallet_id.wallet
+
+        is_disabled = request.data['is_disabled']
+        if not is_disabled:
+            data = {
+                "data": "invalid parameters",
+                "status": "failed"
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        if is_disabled == "true":
+            wallet.status = False
+            wallet.disabled_at = timezone.localtime()
+            wallet.save(update_fields=['status', 'disabled_at'])
+
+            response = {
+                'status': 'success',
+                'data': {
+                    'wallet': {
+                        'id': str(wallet.id),
+                        'owned_by': str(wallet.owned_by.id),
+                        'status': 'enabled' if wallet.status else "disabled",
+                        'disabled_at': timezone.localtime(wallet.disabled_at).strftime('%Y-%m-%d %H:%M:%S') if wallet.disabled_at else "",
+                        'balance': wallet.balance
+                    }
+                }
+            }
+            return Response(response)
+        else:
+            response = {
+                "message": "wallet not disabled",
+                "status": "failed"
+            }
+            return Response(response)
+
 
 class Deposit(WalletAuthenticationView):
 
