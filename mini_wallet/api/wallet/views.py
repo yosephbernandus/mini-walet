@@ -8,7 +8,7 @@ from mini_wallet.api.views import WalletAuthenticationView
 
 from mini_wallet.api.response import ErrorResponse
 
-from .forms import DepositForm
+from .forms import DepositForm, WithDrawalsForm
 
 
 class Wallet(WalletAuthenticationView):
@@ -102,7 +102,7 @@ class Deposit(WalletAuthenticationView):
                     "id": deposit.id,
                     "deposited_by": wallet_id.id,
                     "status": deposit.get_status_display(),
-                    "deposited_at": timezone.localtime(wallet_id.wallet.enabled_at).strftime('%Y-%m-%d %H:%M:%S'),
+                    "deposited_at": timezone.localtime(deposit.deposited_at).strftime('%Y-%m-%d %H:%M:%S'),
                     "amount": deposit.amount,
                     "reference_id": deposit.reference_id
                 }
@@ -110,3 +110,54 @@ class Deposit(WalletAuthenticationView):
             return Response(response)
 
         return ErrorResponse(form=form)
+
+
+class WithDrawals(WalletAuthenticationView):
+
+    def post(self, request: Request) -> Response:
+        token = request.headers.get('Authorization')
+
+        wallet_id = get_object_or_404(WalletID, token=token)
+        if not hasattr(wallet_id, 'wallet'):
+            data = {
+                "data": "wallet not found",
+                "status": "failed"
+            }
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+        wallet = wallet_id.wallet
+        if not wallet.status:
+            data = {
+                "data": "wallet inactive",
+                "status": "failed"
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        if wallet.balance == 0.0:
+            data = {
+                "data": "insufficient balance",
+                "status": "failed"
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        form = WithDrawalsForm(data=request.data, wallet=wallet)
+        if form.is_valid():
+            withdrawals = form.save()
+            wallet.balance -= withdrawals.amount
+            wallet.save(update_fields=['balance'])
+
+            response = {
+                "status": "success",
+                "data": {
+                    "id": withdrawals.id,
+                    "deposited_by": wallet_id.id,
+                    "status": withdrawals.get_status_display(),
+                    "deposited_at": timezone.localtime(withdrawals.withdrawn_at).strftime('%Y-%m-%d %H:%M:%S'),
+                    "amount": withdrawals.amount,
+                    "reference_id": withdrawals.reference_id
+                }
+            }
+            return Response(response)
+
+        return ErrorResponse(form=form)
+
