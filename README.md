@@ -20,3 +20,7 @@
 - go to menu wallet ids and save, dont fill a token field. it will generated when user login
 - go to menu wallet, create a wallet and fill `owned_by` field using wallets ids that created before, it must show a dropdown list after than save
 - run api using postman/curl
+
+
+## Postman
+https://documenter.getpostman.com/view/1635245/UVeJKQRB
