@@ -2,7 +2,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import (JSONParser, MultiPartParser, FormParser)
 from rest_framework.views import APIView
 
-from .authentication import TokenAuthentication
+from .authentication import JSONSingleTokenAuthentication
 
 
 class WalletAPIView(APIView):
@@ -13,4 +13,4 @@ class WalletAPIView(APIView):
 
 class WalletAuthenticationView(WalletAPIView):
 
-    authentication_classes = (TokenAuthentication)
+    authentication_classes = (JSONSingleTokenAuthentication,)

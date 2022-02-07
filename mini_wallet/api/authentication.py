@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from mini_wallet.apps.wallets.models import WalletID
 
 
-class TokenAuthentication(BaseAuthentication):
+class JSONSingleTokenAuthentication(BaseAuthentication):
     """
     Wallet ID Token Authentication
     """

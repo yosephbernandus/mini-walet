@@ -19,13 +19,13 @@ class Wallet(models.Model):
     Wallet
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owned_by = models.ForeignKey(WalletID, on_delete=models.CASCADE)
-    status = models.BooleanField(default=True)
+    owned_by = models.OneToOneField(WalletID, related_name="wallet", on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
     enabled_at = models.DateTimeField(blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
     def __str__(self):
-        return self.owned_by
+        return f"{self.owned_by.id}"
 
 
 class Deposit(models.Model):
@@ -44,7 +44,7 @@ class Deposit(models.Model):
     reference_id = models.UUIDField(default=uuid.uuid4)
     
     def __str__(self):
-        return self.wallet.id
+        return f"{self.id}"
 
 
 class Withdrawal(models.Model):
@@ -63,4 +63,4 @@ class Withdrawal(models.Model):
     reference_id = models.UUIDField(default=uuid.uuid4)
     
     def __str__(self):
-        return self.wallet.id
+        return f"{self.id}"
