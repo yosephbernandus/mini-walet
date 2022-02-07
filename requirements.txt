@@ -1,0 +1,12 @@
+Django==3.2.10
+django-model-utils==4.1.1
+djangorestframework==3.12.2
+django_extensions==3.1.0
+
+psycopg2-binary==2.8.6
+# phone number
+responses==0.12.1
+requests==2.25.1
+
+# timehelper
+python-dateutil==2.8.1
