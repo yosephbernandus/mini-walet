@@ -68,7 +68,7 @@ class Wallet(WalletAuthenticationView):
         }
         return Response(response)
 
-    def put(self, request: Request) -> Response:
+    def patch(self, request: Request) -> Response:
         token = request.headers.get('Authorization')
 
         wallet_id = get_object_or_404(WalletID, token=token)
